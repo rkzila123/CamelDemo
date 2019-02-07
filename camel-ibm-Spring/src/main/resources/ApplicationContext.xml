@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+		
+	<context:annotation-config />
+
+	<bean id="routeBuilder" class="com.demo.route.SimpleRouteBuilder" />
+	
+	<bean id="myProcessor" class="com.demo.process.MyProcessor" />
+
+	<camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+		<routeBuilder ref="routeBuilder" />
+	</camelContext>
+		
+	<bean id="wmqConfig" class="org.apache.camel.component.jms.JmsConfiguration">
+		<property name="connectionFactory" ref="wmqConnectionFactory" />
+		<property name="concurrentConsumers" value="10" />
+	</bean>
+	
+	<bean id="wmq" class="org.apache.camel.component.jms.JmsComponent">
+		<property name="configuration" ref="wmqConfig" />
+	</bean>	
+	<bean id="wmqConnectionFactory" class="com.ibm.mq.jms.MQConnectionFactory">
+		<property name="hostName" value="IFT-HYD-DT-318" />
+		<property name="port" value="1414" />
+		<property name="queueManager" value="STARBRQM" />
+	</bean>
+	
+	
+	
+	<!-- <camel:camelContext id="camelContext">
+	<camel:route>
+		<camel:from uri="wmq:queue:STARBRQ?disableReplyTo=true" />
+		<camel:to uri="stream:out" />
+	</camel:route>
+	</camel:camelContext> -->
+	
+</beans>
